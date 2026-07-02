@@ -26,8 +26,8 @@ object SubscriptionsHelper {
 
         val subscriptionManager = getSubscriptionsManager(context) ?: return null
         return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 -> subscriptionManager.activeSubscriptionInfoList.map { it.simSlotIndex }
-                .toSet()
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 -> subscriptionManager.activeSubscriptionInfoList?.map { it.simSlotIndex }
+                ?.toSet()
             else -> null
         }
     }
@@ -40,7 +40,7 @@ object SubscriptionsHelper {
 
         val subscriptionManager = getSubscriptionsManager(context) ?: return null
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            subscriptionManager.activeSubscriptionInfoList.find {
+            subscriptionManager.activeSubscriptionInfoList?.find {
                 it.simSlotIndex == simSlotIndex
             }?.subscriptionId
         } else {
@@ -56,7 +56,7 @@ object SubscriptionsHelper {
 
         val subscriptionManager = getSubscriptionsManager(context) ?: return null
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            subscriptionManager.activeSubscriptionInfoList.find {
+            subscriptionManager.activeSubscriptionInfoList?.find {
                 it.subscriptionId == subscriptionId
             }?.simSlotIndex
         } else {
