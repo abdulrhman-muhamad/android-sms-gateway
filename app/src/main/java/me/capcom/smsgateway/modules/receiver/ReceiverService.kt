@@ -25,6 +25,7 @@ class ReceiverService : KoinComponent {
     private val webHooksService: WebHooksService by inject()
     private val logsService: LogsService by inject()
     private val incomingMessagesService: IncomingMessagesService by inject()
+    private val receiverSettings: ReceiverSettings by inject()
 
     private val eventsReceiver by lazy { EventsReceiver() }
     private val mmsContentObserver by lazy { MmsContentObserver() }
@@ -35,7 +36,9 @@ class ReceiverService : KoinComponent {
         MmsReceiver.register(context)
         eventsReceiver.start()
         mmsContentObserver.start()
-        smsContentObserver.start()
+        if (receiverSettings.contentProviderEnabled) {
+            smsContentObserver.start()
+        }
     }
 
     fun stop(context: Context) {
@@ -200,19 +203,19 @@ class ReceiverService : KoinComponent {
         val projection = mutableListOf(
             Telephony.Sms._ID,
             Telephony.Sms.ADDRESS,
-            Telephony.Sms.DATE,
+            Telephony.Sms.DATE_SENT,
             Telephony.Sms.BODY,
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             projection += Telephony.Sms.SUBSCRIPTION_ID
         }
 
-        val selection = "${Telephony.Sms.DATE} >= ? AND ${Telephony.Sms.DATE} <= ?"
+        val selection = "${Telephony.Sms.DATE_SENT} >= ? AND ${Telephony.Sms.DATE_SENT} <= ?"
         val selectionArgs = arrayOf(
             period.first.time.toString(),
             period.second.time.toString()
         )
-        val sortOrder = Telephony.Sms.DATE
+        val sortOrder = Telephony.Sms.DATE_SENT
 
         val contentResolver = context.contentResolver
         val cursor = contentResolver.query(
